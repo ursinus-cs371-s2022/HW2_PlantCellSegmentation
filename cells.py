@@ -1,10 +1,7 @@
 import numpy as np
 from scipy import ndimage
+from scipy import misc
 import matplotlib.pyplot as plt
-import skimage.io
-from skimage.transform import resize
-from skimage.color import rgb2gray
-import time
 
 def load_cells_grayscale(filename, n_pixels = 0):
     """
@@ -23,8 +20,8 @@ def load_cells_grayscale(filename, n_pixels = 0):
     ndarray(N, N)
         A square grayscale image
     """
-    cells_original = skimage.io.imread(filename)
-    cells_gray = rgb2gray(cells_original)
+    I = plt.imread(filename)
+    cells_gray = 0.2125*I[:, :, 0] + 0.7154*I[:, :, 1] + 0.0721*I[:, :, 2]
     # Denoise a bit with a uniform filter
     cells_gray = ndimage.uniform_filter(cells_gray, size=10)
     cells_gray = cells_gray - np.min(cells_gray)
@@ -32,7 +29,7 @@ def load_cells_grayscale(filename, n_pixels = 0):
     N = int(np.sqrt(n_pixels))
     if n_pixels > 0:
         # Resize to a square image
-        cells_gray = resize(cells_gray, (N, N), anti_aliasing=True)
+        cells_gray = misc.imresize(cells_gray, (N, N))
     return cells_gray
 
 
